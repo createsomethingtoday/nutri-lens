@@ -14,6 +14,75 @@ export default function ImageCapture({ onIngredientsDetected }: Props) {
   const [preview, setPreview] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  const preprocessImage = async (file: File): Promise<File> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        // Create canvas
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          reject(new Error('Could not get canvas context'));
+          return;
+        }
+
+        // Set dimensions (maintain high resolution)
+        const maxDimension = 2048; // Max dimension while maintaining aspect ratio
+        let width = img.width;
+        let height = img.height;
+        
+        if (width > maxDimension || height > maxDimension) {
+          if (width > height) {
+            height = (height / width) * maxDimension;
+            width = maxDimension;
+          } else {
+            width = (width / height) * maxDimension;
+            height = maxDimension;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+
+        // Draw and enhance image
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, 0, width, height);
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Increase contrast
+        const imageData = ctx.getImageData(0, 0, width, height);
+        const data = imageData.data;
+        const contrast = 1.2; // Increase contrast by 20%
+        const intercept = 128 * (1 - contrast);
+
+        for (let i = 0; i < data.length; i += 4) {
+          // Convert to grayscale and increase contrast
+          const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
+          const newVal = contrast * avg + intercept;
+          data[i] = data[i + 1] = data[i + 2] = newVal;
+        }
+
+        ctx.putImageData(imageData, 0, 0);
+
+        // Convert back to file
+        canvas.toBlob((blob) => {
+          if (!blob) {
+            reject(new Error('Could not convert canvas to blob'));
+            return;
+          }
+          const processedFile = new File([blob], file.name, {
+            type: 'image/jpeg',
+            lastModified: Date.now(),
+          });
+          resolve(processedFile);
+        }, 'image/jpeg', 0.95);
+      };
+
+      img.onerror = () => reject(new Error('Failed to load image'));
+      img.src = URL.createObjectURL(file);
+    });
+  };
+
   const processImage = async (file: File) => {
     console.log('Processing image:', file.name)
     setIsProcessing(true)
@@ -28,10 +97,15 @@ export default function ImageCapture({ onIngredientsDetected }: Props) {
       }
       reader.readAsDataURL(file)
 
+      // Preprocess the image
+      console.log('Preprocessing image...')
+      const processedFile = await preprocessImage(file)
+      console.log('Image preprocessing complete')
+
       // Process with Tesseract
       console.log('Starting Tesseract processing')
       const worker = await createWorker('eng')
-      const { data: { text } } = await worker.recognize(file)
+      const { data: { text } } = await worker.recognize(processedFile)
       await worker.terminate()
       console.log('Tesseract processing complete')
       
