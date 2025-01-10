@@ -10,10 +10,19 @@ const getRedisClient = () => {
     return null
   }
 
-  return new Redis({
-    url: process.env.UPSTASH_REDIS_REST_URL,
-    token: process.env.UPSTASH_REDIS_REST_TOKEN,
-  })
+  // Ensure URL starts with https://
+  const url = process.env.UPSTASH_REDIS_REST_URL
+  const formattedUrl = url.startsWith('https://') ? url : `https://${url}`
+
+  try {
+    return new Redis({
+      url: formattedUrl,
+      token: process.env.UPSTASH_REDIS_REST_TOKEN,
+    })
+  } catch (error) {
+    console.error('Failed to initialize Redis client:', error)
+    return null
+  }
 }
 
 const redis = getRedisClient()
