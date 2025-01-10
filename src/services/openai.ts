@@ -17,21 +17,16 @@ export async function analyzeNutrition(
     Follow this structure:
     1. Start with a level-2 heading (##) for the main topic
     2. Use level-3 headings (###) for subtopics
-    3. ALWAYS present nutritional data in tables
-    4. Use bullet lists for benefits or considerations
-    5. Use **bold** for important values
-    
-    Example format:
-    ## Nutritional Analysis
-    
-    ### Key Nutrients
+    3. ALWAYS present nutritional data in tables with proper spacing:
+
     | Nutrient | Amount | Daily Value |
     |----------|---------|-------------|
     | Protein  | 20g     | 40%        |
+
+    4. Use bullet lists for benefits or considerations
+    5. Use **bold** for important values
     
-    ### Health Considerations
-    * Benefit one
-    * Benefit two
+    IMPORTANT: Always add empty lines before and after tables for proper formatting.
     
     Keep responses concise and focused on the question asked.`;
 

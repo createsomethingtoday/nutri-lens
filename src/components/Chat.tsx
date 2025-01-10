@@ -112,27 +112,43 @@ export default function Chat({ ingredients }: Props) {
                   message.role === 'user' 
                     ? 'prose-invert' 
                     : 'prose-gray'
-                } prose-headings:font-bold prose-h2:text-lg prose-h3:text-base prose-p:text-sm prose-ul:text-sm prose-li:text-sm prose-table:text-sm`}
+                } prose-headings:font-bold prose-h2:text-lg prose-h3:text-base prose-p:text-sm prose-ul:text-sm prose-li:text-sm prose-table:text-sm [&_table]:border [&_th]:border [&_td]:border [&_table]:border-collapse`}
                 components={{
+                  p: ({ children }) => {
+                    const isTable = children?.toString().startsWith('|');
+                    if (isTable) {
+                      return <div>{children}</div>;
+                    }
+                    return <p className="mb-4">{children}</p>;
+                  },
                   table: ({ ...props }) => (
                     <div className="my-4 overflow-x-auto">
-                      <table {...props} className="min-w-full table-auto border-collapse border border-gray-200" />
+                      <table {...props} className="min-w-full table-auto" />
                     </div>
                   ),
                   thead: ({ ...props }) => (
                     <thead {...props} className="bg-gray-50" />
                   ),
                   tbody: ({ ...props }) => (
-                    <tbody {...props} className="bg-white divide-y divide-gray-200" />
+                    <tbody {...props} className="divide-y divide-gray-200" />
                   ),
                   tr: ({ ...props }) => (
                     <tr {...props} className="hover:bg-gray-50" />
                   ),
                   th: ({ ...props }) => (
-                    <th {...props} className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border border-gray-200" />
+                    <th {...props} className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" />
                   ),
                   td: ({ ...props }) => (
-                    <td {...props} className="px-4 py-2 text-sm text-gray-900 border border-gray-200" />
+                    <td {...props} className="px-4 py-2 text-sm text-gray-900 whitespace-nowrap" />
+                  ),
+                  a: ({ ...props }) => (
+                    <a {...props} target="_blank" rel="noopener noreferrer" className="underline" />
+                  ),
+                  code: ({ ...props }) => (
+                    <code {...props} className="font-mono bg-black/10 rounded px-1" />
+                  ),
+                  pre: ({ ...props }) => (
+                    <pre {...props} className="font-mono bg-black/10 rounded p-2 overflow-x-auto" />
                   ),
                 }}
               >
