@@ -8,6 +8,9 @@ const inter = Inter({ subsets: ["latin"] })
 export const metadata: Metadata = {
   title: "Nutrition Facts Analyzer",
   description: "Analyze nutrition facts using AI",
+  icons: {
+    icon: '/favicon.ico',
+  },
 }
 
 export default function RootLayout({
