@@ -92,7 +92,7 @@ export default function Chat({ ingredients }: Props) {
   }
 
   return (
-    <div className="border border-gray-200 rounded-xl shadow-lg bg-white overflow-hidden">
+    <div className="backdrop-blur-sm bg-white/30 border border-white/30 rounded-xl overflow-hidden">
       <div className="h-[500px] overflow-y-auto p-6 space-y-6">
         {messages.map((message) => (
           <div
@@ -100,10 +100,10 @@ export default function Chat({ ingredients }: Props) {
             className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             <div
-              className={`max-w-[80%] rounded-2xl p-4 ${
+              className={`max-w-[80%] rounded-2xl p-4 backdrop-blur-sm border ${
                 message.role === 'user'
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-gray-100'
+                  ? 'bg-blue-500/80 text-white border-blue-400/30'
+                  : 'bg-white/50 border-white/30'
               }`}
             >
               <ReactMarkdown 
@@ -111,7 +111,7 @@ export default function Chat({ ingredients }: Props) {
                 className={`prose prose-sm max-w-none ${
                   message.role === 'user' 
                     ? 'prose-invert' 
-                    : 'prose-gray'
+                    : 'prose-slate'
                 } prose-headings:font-bold prose-h2:text-lg prose-h3:text-base prose-p:text-sm prose-ul:text-sm prose-li:text-sm prose-table:text-sm [&_table]:border [&_th]:border [&_td]:border [&_table]:border-collapse`}
                 components={{
                   p: ({ children }) => {
@@ -160,22 +160,22 @@ export default function Chat({ ingredients }: Props) {
         <div ref={messagesEndRef} />
       </div>
       
-      <div className="border-t border-gray-200 p-4 bg-gray-50">
+      <div className="border-t border-white/30 p-4 bg-white/20 backdrop-blur-sm">
         <form onSubmit={sendMessage} className="flex gap-3">
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Ask about the nutrition facts..."
-            className="flex-1 px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+            className="flex-1 px-4 py-2 bg-white/50 backdrop-blur-sm border border-gray-300/70 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent transition-all duration-200"
             disabled={isLoading}
           />
           <button
             type="submit"
-            className={`px-6 py-2 rounded-lg font-medium transition-all duration-200 ${
+            className={`px-6 py-2 rounded-lg font-medium transition-all duration-200 backdrop-blur-sm ${
               isLoading 
-                ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                : 'bg-blue-500 text-white hover:bg-blue-600 hover:shadow-md active:scale-95'
+                ? 'bg-gray-200/50 text-gray-500 cursor-not-allowed border border-white/30'
+                : 'bg-blue-500/80 text-white hover:bg-blue-600/80 border border-blue-400/30'
             }`}
             disabled={isLoading}
           >
