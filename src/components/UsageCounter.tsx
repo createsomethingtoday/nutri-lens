@@ -7,7 +7,7 @@ interface UsageCounterProps {
 
 const UsageCounter: FC<UsageCounterProps> = ({ imageUploads, chatInteractions }) => {
   return (
-    <div className="fixed top-0 right-0 md:w-auto w-full backdrop-blur-md bg-white/30 border border-white/30 rounded-bl-2xl md:rounded-bl-2xl md:rounded-tr-none p-4 md:shadow-lg">
+    <div className="fixed top-0 right-0 md:w-auto w-full backdrop-blur-md bg-white/30 border border-white/30 rounded-bl-2xl md:rounded-bl-2xl md:rounded-tr-none p-4">
       <div className="flex md:flex-col gap-4 justify-center text-sm text-gray-600">
         <div className="flex items-center gap-2">
           <span className="font-medium">📸 Images:</span>
