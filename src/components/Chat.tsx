@@ -7,6 +7,7 @@ import { analyzeNutrition } from '../services/openai'
 
 interface Props {
   ingredients: string
+  onInteraction?: () => void
 }
 
 interface Message {
@@ -15,7 +16,7 @@ interface Message {
   id: string
 }
 
-export default function Chat({ ingredients }: Props) {
+export default function Chat({ ingredients, onInteraction }: Props) {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
@@ -39,6 +40,8 @@ export default function Chat({ ingredients }: Props) {
     e.preventDefault()
     if (!input.trim() || isLoading) return
 
+    onInteraction?.();
+    
     const userMessage: Message = { 
       role: 'user', 
       content: input,
