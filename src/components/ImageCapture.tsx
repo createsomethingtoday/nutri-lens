@@ -1,9 +1,9 @@
 'use client'
 
-import React from 'react'
 import { useState, useRef } from 'react'
 import { createWorker } from 'tesseract.js'
 import { parseNutritionText, formatNutritionFacts } from '../utils/nutritionParser'
+import Image from 'next/image'
 
 interface Props {
   onIngredientsDetected: (ingredients: string) => void
@@ -101,9 +101,11 @@ export default function ImageCapture({ onIngredientsDetected }: Props) {
       >
         {preview ? (
           <div className="relative w-full h-full bg-gray-50">
-            <img 
-              src={preview} 
-              alt="Nutrition label preview" 
+            <Image
+              src={preview}
+              alt="Nutrition label preview"
+              width={400}
+              height={300}
               className="w-full h-full object-contain"
             />
             {isProcessing && (
