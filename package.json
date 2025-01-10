@@ -10,6 +10,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@vercel/kv": "^3.0.0",
     "next": "^15.1.4",
     "openai": "^4.78.0",
     "react": "^18.2.0",

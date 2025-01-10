@@ -1,51 +1,28 @@
-import { NextResponse } from 'next/server';
-import fs from 'node:fs/promises';
-import path from 'node:path';
+import { kv } from '@vercel/kv'
+import { NextResponse } from 'next/server'
 
-const USAGE_FILE = path.join(process.cwd(), 'data', 'usage.json');
-
-// Ensure the data directory exists
-async function ensureDataDir() {
-  const dataDir = path.join(process.cwd(), 'data');
-  try {
-    await fs.access(dataDir);
-  } catch {
-    await fs.mkdir(dataDir, { recursive: true });
-  }
-}
+const USAGE_KEY = 'app:usage'
 
 // Get current usage
 async function getUsage() {
-  await ensureDataDir();
-  try {
-    const data = await fs.readFile(USAGE_FILE, 'utf-8');
-    return JSON.parse(data);
-  } catch {
-    return { imageUploads: 0, chatInteractions: 0 };
-  }
-}
-
-// Save usage
-async function saveUsage(usage: { imageUploads: number; chatInteractions: number }) {
-  await ensureDataDir();
-  await fs.writeFile(USAGE_FILE, JSON.stringify(usage));
+  const usage = await kv.hgetall(USAGE_KEY)
+  return usage || { imageUploads: 0, chatInteractions: 0 }
 }
 
 export async function GET() {
-  const usage = await getUsage();
-  return NextResponse.json(usage);
+  const usage = await getUsage()
+  return NextResponse.json(usage)
 }
 
 export async function POST(request: Request) {
-  const { type } = await request.json();
-  const usage = await getUsage();
+  const { type } = await request.json()
   
   if (type === 'image') {
-    usage.imageUploads++;
+    await kv.hincrby(USAGE_KEY, 'imageUploads', 1)
   } else if (type === 'chat') {
-    usage.chatInteractions++;
+    await kv.hincrby(USAGE_KEY, 'chatInteractions', 1)
   }
   
-  await saveUsage(usage);
-  return NextResponse.json(usage);
+  const usage = await getUsage()
+  return NextResponse.json(usage)
 } 
