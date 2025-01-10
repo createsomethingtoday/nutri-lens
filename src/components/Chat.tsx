@@ -96,14 +96,14 @@ export default function Chat({ ingredients, onInteraction }: Props) {
 
   return (
     <div className="backdrop-blur-sm bg-white/30 border border-white/30 rounded-xl overflow-hidden">
-      <div className="h-[500px] overflow-y-auto p-6 space-y-6">
+      <div className="h-[500px] overflow-y-auto p-2 md:p-6 space-y-4 md:space-y-6">
         {messages.map((message) => (
           <div
             key={message.id}
             className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             <div
-              className={`max-w-[80%] rounded-2xl p-4 backdrop-blur-sm border ${
+              className={`max-w-[95%] md:max-w-[80%] rounded-2xl p-2 md:p-4 backdrop-blur-sm border ${
                 message.role === 'user'
                   ? 'bg-blue-500/80 text-white border-blue-400/30'
                   : 'bg-white/50 border-white/30'
@@ -115,7 +115,7 @@ export default function Chat({ ingredients, onInteraction }: Props) {
                   message.role === 'user' 
                     ? 'prose-invert' 
                     : 'prose-slate'
-                } prose-headings:font-bold prose-h2:text-lg prose-h3:text-base prose-p:text-sm prose-ul:text-sm prose-li:text-sm prose-table:text-sm [&_table]:border [&_th]:border [&_td]:border [&_table]:border-collapse`}
+                } prose-headings:font-bold prose-h2:text-lg prose-h3:text-base prose-p:text-sm prose-ul:text-sm prose-li:text-sm prose-table:text-xs md:prose-table:text-sm [&_table]:border [&_th]:border [&_td]:border [&_table]:border-collapse`}
                 components={{
                   p: ({ children }) => {
                     const isTable = children?.toString().startsWith('|');
@@ -125,24 +125,25 @@ export default function Chat({ ingredients, onInteraction }: Props) {
                     return <p className="mb-4">{children}</p>;
                   },
                   table: ({ ...props }) => (
-                    <div className="my-4 overflow-x-auto">
+                    <div className="my-4 overflow-x-auto relative group">
+                      <div className="absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-white/30 to-transparent pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity" />
                       <table {...props} className="min-w-full table-auto" />
                     </div>
                   ),
                   thead: ({ ...props }) => (
-                    <thead {...props} className="bg-gray-50" />
+                    <thead {...props} className="bg-gray-50/50" />
                   ),
                   tbody: ({ ...props }) => (
-                    <tbody {...props} className="divide-y divide-gray-200" />
+                    <tbody {...props} className="divide-y divide-gray-200/50" />
                   ),
                   tr: ({ ...props }) => (
-                    <tr {...props} className="hover:bg-gray-50" />
+                    <tr {...props} className="hover:bg-gray-50/30" />
                   ),
                   th: ({ ...props }) => (
-                    <th {...props} className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" />
+                    <th {...props} className="px-2 py-1 md:px-4 md:py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" />
                   ),
                   td: ({ ...props }) => (
-                    <td {...props} className="px-4 py-2 text-sm text-gray-900 whitespace-nowrap" />
+                    <td {...props} className="px-2 py-1 md:px-4 md:py-2 text-xs md:text-sm text-gray-900 whitespace-nowrap" />
                   ),
                   a: ({ ...props }) => (
                     <a {...props} target="_blank" rel="noopener noreferrer" className="underline" />
@@ -163,19 +164,19 @@ export default function Chat({ ingredients, onInteraction }: Props) {
         <div ref={messagesEndRef} />
       </div>
       
-      <div className="border-t border-white/30 p-4 bg-white/20 backdrop-blur-sm">
-        <form onSubmit={sendMessage} className="flex gap-3">
+      <div className="border-t border-white/30 p-2 md:p-4 bg-white/20 backdrop-blur-sm">
+        <form onSubmit={sendMessage} className="flex flex-col md:flex-row gap-2 md:gap-3">
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Ask about the nutrition facts..."
-            className="flex-1 px-4 py-2 bg-white/50 backdrop-blur-sm border border-gray-300/70 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent transition-all duration-200"
+            className="flex-1 px-3 md:px-4 py-2 text-sm md:text-base bg-white/50 backdrop-blur-sm border border-gray-300/70 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent transition-all duration-200"
             disabled={isLoading}
           />
           <button
             type="submit"
-            className={`px-6 py-2 rounded-lg font-medium transition-all duration-200 backdrop-blur-sm ${
+            className={`py-2 md:px-6 rounded-lg font-medium text-sm md:text-base transition-all duration-200 backdrop-blur-sm shrink-0 ${
               isLoading 
                 ? 'bg-gray-200/50 text-gray-500 cursor-not-allowed border border-white/30'
                 : 'bg-blue-500/80 text-white hover:bg-blue-600/80 border border-blue-400/30'
