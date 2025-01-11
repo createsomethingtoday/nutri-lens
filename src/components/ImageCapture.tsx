@@ -1,8 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { createWorker } from 'tesseract.js'
-import { parseNutritionText, formatNutritionFacts } from '../utils/nutritionParser'
+import { analyzeImageWithVision } from '../services/openai'
 
 interface Props {
   onIngredientsDetected: (ingredients: string) => void
@@ -13,75 +12,6 @@ export default function ImageCapture({ onIngredientsDetected }: Props) {
   const [error, setError] = useState<string | null>(null)
   const [preview, setPreview] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
-
-  const preprocessImage = async (file: File): Promise<File> => {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.onload = () => {
-        // Create canvas
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        if (!ctx) {
-          reject(new Error('Could not get canvas context'));
-          return;
-        }
-
-        // Set dimensions (maintain high resolution)
-        const maxDimension = 2048; // Max dimension while maintaining aspect ratio
-        let width = img.width;
-        let height = img.height;
-        
-        if (width > maxDimension || height > maxDimension) {
-          if (width > height) {
-            height = (height / width) * maxDimension;
-            width = maxDimension;
-          } else {
-            width = (width / height) * maxDimension;
-            height = maxDimension;
-          }
-        }
-
-        canvas.width = width;
-        canvas.height = height;
-
-        // Draw and enhance image
-        ctx.fillStyle = 'white';
-        ctx.fillRect(0, 0, width, height);
-        ctx.drawImage(img, 0, 0, width, height);
-
-        // Increase contrast
-        const imageData = ctx.getImageData(0, 0, width, height);
-        const data = imageData.data;
-        const contrast = 1.2; // Increase contrast by 20%
-        const intercept = 128 * (1 - contrast);
-
-        for (let i = 0; i < data.length; i += 4) {
-          // Convert to grayscale and increase contrast
-          const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
-          const newVal = contrast * avg + intercept;
-          data[i] = data[i + 1] = data[i + 2] = newVal;
-        }
-
-        ctx.putImageData(imageData, 0, 0);
-
-        // Convert back to file
-        canvas.toBlob((blob) => {
-          if (!blob) {
-            reject(new Error('Could not convert canvas to blob'));
-            return;
-          }
-          const processedFile = new File([blob], file.name, {
-            type: 'image/jpeg',
-            lastModified: Date.now(),
-          });
-          resolve(processedFile);
-        }, 'image/jpeg', 0.95);
-      };
-
-      img.onerror = () => reject(new Error('Failed to load image'));
-      img.src = URL.createObjectURL(file);
-    });
-  };
 
   const processImage = async (file: File) => {
     console.log('Processing image:', file.name)
@@ -97,25 +27,38 @@ export default function ImageCapture({ onIngredientsDetected }: Props) {
       }
       reader.readAsDataURL(file)
 
-      // Preprocess the image
-      console.log('Preprocessing image...')
-      const processedFile = await preprocessImage(file)
-      console.log('Image preprocessing complete')
+      // Convert file to base64 for Vision API
+      const base64Reader = new FileReader()
+      const base64Promise = new Promise<string>((resolve, reject) => {
+        base64Reader.onload = () => {
+          const base64 = (base64Reader.result as string).split(',')[1]
+          resolve(base64)
+        }
+        base64Reader.onerror = reject
+      })
+      base64Reader.readAsDataURL(file)
+      
+      const base64Data = await base64Promise
+      console.log('Image converted to base64')
 
-      // Process with Tesseract
-      console.log('Starting Tesseract processing')
-      const worker = await createWorker('eng')
-      const { data: { text } } = await worker.recognize(processedFile)
-      await worker.terminate()
-      console.log('Tesseract processing complete')
-      
-      // Parse and format the nutrition facts
-      console.log('Raw text:', text)
-      const nutritionFacts = parseNutritionText(text)
-      const formattedText = formatNutritionFacts(nutritionFacts)
-      console.log('Formatted text:', formattedText)
-      
-      onIngredientsDetected(formattedText)
+      // Process with Vision API
+      console.log('Starting Vision API processing')
+      try {
+        const result = await analyzeImageWithVision(base64Data, (chunk) => {
+          console.log('Received chunk:', chunk)
+          // You could update a state variable here to show streaming progress if desired
+        })
+        
+        console.log('Vision processing complete, result:', result)
+        if (result) {
+          onIngredientsDetected(result)
+        } else {
+          throw new Error('No result received from Vision API')
+        }
+      } catch (apiError) {
+        console.error('Vision API Error:', apiError)
+        setError(apiError instanceof Error ? apiError.message : 'Failed to process image with Vision API')
+      }
     } catch (err) {
       console.error('Error processing image:', err)
       setError(err instanceof Error ? err.message : 'Error processing image. Please try again with a clearer image.')
