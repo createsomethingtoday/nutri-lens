@@ -131,14 +131,15 @@ export default function ImageCapture({ onIngredientsDetected }: Props) {
               className="w-full h-full object-contain"
             />
             {isProcessing && (
-              <div className="absolute inset-0 backdrop-blur-sm bg-black/30 flex items-center justify-center">
-                <div className="flex flex-col items-center space-y-4 text-white">
-                  <div className="flex space-x-2">
-                    <div className="w-3 h-3 bg-white rounded-full animate-bounce" />
-                    <div className="w-3 h-3 bg-white rounded-full animate-bounce delay-100" />
-                    <div className="w-3 h-3 bg-white rounded-full animate-bounce delay-200" />
+              <div className="absolute inset-0 backdrop-blur-md bg-white/30 flex items-center justify-center">
+                <div className="relative flex flex-col items-center space-y-4 p-8 rounded-2xl bg-white/20 backdrop-blur-sm border border-white/20 shadow-lg">
+                  <div className="flex space-x-3">
+                    <div className="w-4 h-4 rounded-full bg-blue-500/80 animate-[pulse_1.5s_ease-in-out_0ms_infinite]" />
+                    <div className="w-4 h-4 rounded-full bg-blue-500/80 animate-[pulse_1.5s_ease-in-out_200ms_infinite]" />
+                    <div className="w-4 h-4 rounded-full bg-blue-500/80 animate-[pulse_1.5s_ease-in-out_400ms_infinite]" />
                   </div>
-                  <p className="text-sm font-medium">Processing image...</p>
+                  <p className="text-sm font-medium text-gray-800">Analyzing nutrition label...</p>
+                  <div className="absolute -inset-0.5 rounded-2xl bg-gradient-to-r from-blue-500/20 to-purple-500/20 blur opacity-50 group-hover:opacity-75 transition" />
                 </div>
               </div>
             )}
